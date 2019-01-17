@@ -30,7 +30,6 @@ class App extends Component {
     filter: "",
     display: "",
     rows: null,
-    favourites: wasteData.filter(item => item.keywords.search("bread bag") >= 0),
   }
   
   handleChange = event => {
@@ -40,45 +39,51 @@ class App extends Component {
     });
   } 
 
-  handleFavourite(obj){
+  handleFavourite(item){
     const { data, rows } = this.state;
-    let iD = data.findIndex((item) => item.title === obj.title);
-    let iR = rows.findIndex((item) => item.title === obj.title);
-    console.log(iR);
     
+    let iD = data.findIndex(obj => obj.title === item.title);
+    let iR = rows.findIndex(obj => obj.title === item.title);
+
     this.setState(prevState => ({
-      data: [
+      data: iR >= 0 
+        ? [
         ...prevState.data.slice(0,iD),
         {
             ...data[iD],
-            fav: !obj.fav,
+            fav: !item.fav,
         },
         ...prevState.data.slice(iD+1),
-      ],
-      rows: iR >= 0 ? [
-        ...prevState.rows.slice(0,iR),
-        {
-            ...rows[iR],
-            fav: !obj.fav,
-        },
-        ...prevState.rows.slice(iR+1),
-      ] 
-      :this.state.rows,
+      ]
+      : this.state.data,
+      rows: iR >= 0 
+        ? [
+          ...prevState.rows.slice(0,iR),
+          {
+              ...rows[iR],
+              fav: !item.fav,
+          },
+          ...prevState.rows.slice(iR+1),
+        ] 
+        : this.state.rows,
     }));
+  }
 
-  //  console.log(data);
-    console.log(rows[0].title);
+  handleEnter(event){
+    if(event.key === 'Enter') {
+      console.log(event.key);
+      return(this.handleSearch);
+    }
   }
 
   handleSearch = () => {
+    console.log("search");
     this.setState({
       display: this.state.filter,
       rows: this.state.filter === "" 
         ? null 
         : this.state.data.filter(item => item.keywords.search(this.state.filter) >= 0 || item.category.search(this.state.filter) >= 0),
     });
-    
-    console.log(this.state.rows);
   }
 
   htmlDecode(input){
@@ -87,21 +92,26 @@ class App extends Component {
     return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
   }
 
-  render() {
-    let renderFavs = this.state.data.map((row, index) => (
-      row.fav ?(
-      <TableRow className='Table_Row' key={index}>
-        <IconButton onClick={()=> {console.log(row.title); this.handleFavourite(row)}}>
-        {row.fav ? greenStar : grayStar}
-      </IconButton>
-        <TableCell>{row.title}</TableCell>
-        <TableCell>
-          <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
-        </TableCell>
-      </TableRow>)
-      : null
-    ))
+  renderRows(list){
+    return(
+      list.map((row, index) => (
+        <TableRow className='Table_Row' key={index}>
+           <TableCell>
+            <IconButton onClick={()=> {console.log(row.title); this.handleFavourite(row)}}>
+            {row.fav ? greenStar : grayStar}
+            </IconButton>
+          </TableCell>
+          <TableCell>{row.title}</TableCell>
+          <TableCell>
+            <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
+          </TableCell>
+        </TableRow>
+      ))
+    )
+  }
 
+  render() {
+    let favs = this.state.data.filter(item => item.fav === true);
     return (
       <div className="App">
         <header className="App-header">
@@ -111,7 +121,7 @@ class App extends Component {
         </header>
         <div style= {{margin:30, 'flexDirection': 'column'}}>
           <div className="Row">            
-            <TextField id="searchField" type="text" onChange={this.handleChange} variant="outlined" />
+            <TextField id="searchField" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter} variant="outlined" />
             <Button id="search" variant="contained" onClick = {this.handleSearch} style={{marginLeft: 20}}>
               {searchIcon}
             </Button>
@@ -119,27 +129,18 @@ class App extends Component {
           <Table className='Table'>
             <TableBody >
               {this.state.rows && 
-                this.state.rows.map((row, index) => (
-                  <TableRow className='Table_Row' key={index}>
-                    <IconButton onClick={()=> {console.log(row.title); this.handleFavourite(row)}}>
-                      {row.fav ? greenStar : grayStar}
-                    </IconButton>
-                    <TableCell>{row.title}</TableCell>
-                    <TableCell>
-                      <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                this.renderRows(this.state.rows)}
             </TableBody>
           </Table>
-          <div style={{'backgroundColor': '#f7fefa', 'alignItems': 'flex-start', 'justifyContent': 'flex-start','color' : '#23995c'}}>
+          {favs.length > 0 ? <div style={{backgroundColor: '#f7fefa', alignItems: 'flex-start', justifyContent: 'flex-start', color : '#23995c'}}>
             Favourites
             <Table>
               <TableBody >
-                { this.state.favourites &&  renderFavs }
+                { this.renderRows(favs) }
               </TableBody>
             </Table>
           </div>
+          : null }          
         </div>
       </div>
     );
