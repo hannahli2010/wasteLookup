@@ -69,15 +69,13 @@ class App extends Component {
     }));
   }
 
-  handleEnter(event){
+  handleEnter=(event)=>{
     if(event.key === 'Enter') {
-      console.log(event.key);
-      return(this.handleSearch);
+      this.handleSearch()
     }
   }
 
-  handleSearch = () => {
-    console.log("search");
+  handleSearch(){
     this.setState({
       display: this.state.filter,
       rows: this.state.filter === "" 
@@ -97,7 +95,7 @@ class App extends Component {
       list.map((row, index) => (
         <TableRow className='Table_Row' key={index}>
            <TableCell>
-            <IconButton onClick={()=> {console.log(row.title); this.handleFavourite(row)}}>
+            <IconButton onClick={()=> {this.handleFavourite(row)}}>
             {row.fav ? greenStar : grayStar}
             </IconButton>
           </TableCell>
@@ -122,7 +120,7 @@ class App extends Component {
         <div style= {{margin:30, 'flexDirection': 'column'}}>
           <div className="Row">            
             <TextField id="searchField" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter} variant="outlined" />
-            <Button id="search" variant="contained" onClick = {this.handleSearch} style={{marginLeft: 20}}>
+            <Button id="search" variant="contained" onClick = {()=>{this.handleSearch()}} style={{marginLeft: 20}}>
               {searchIcon}
             </Button>
           </div>
