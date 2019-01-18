@@ -80,7 +80,7 @@ class App extends Component {
       display: this.state.filter,
       rows: this.state.filter === "" 
         ? null 
-        : this.state.data.filter(item => item.keywords.search(this.state.filter) >= 0 || item.category.search(this.state.filter) >= 0),
+        : this.state.data.filter(item => item.keywords.match(this.state.filter) >= 0 || item.category.match(this.state.filter) >= 0),
     });
   }
 
