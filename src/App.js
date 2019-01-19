@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Button, IconButton, Table, TableBody, TableCell, TableRow, TextField } from '@material-ui/core';
+import { Button, IconButton, Table, TableRow, TableCell, TextField, ListItemText } from '@material-ui/core';
 import wasteData from './data.json';
 
 const greenStar = (
@@ -34,7 +34,7 @@ class App extends Component {
   
   handleChange = event => {
     this.setState({
-      filter: event.target.value,
+      filter: event.target.value.toUpperCase(),
       rows: event.target.value === "" ? null : this.state.rows,
     });
   } 
@@ -80,7 +80,7 @@ class App extends Component {
       display: this.state.filter,
       rows: this.state.filter === "" 
         ? null 
-        : this.state.data.filter(item => item.keywords.match(this.state.filter) >= 0 || item.category.match(this.state.filter) >= 0),
+        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0 || item.category.toUpperCase().search(this.state.filter) >= 0),
     });
   }
 
@@ -93,7 +93,7 @@ class App extends Component {
   renderRows(list){
     return(
       list.map((row, index) => (
-        <TableRow className='Table_Row' key={index}>
+        <TableRow className='Table_Row' key={index} >
            <TableCell>
             <IconButton onClick={()=> {this.handleFavourite(row)}}>
             {row.fav ? greenStar : grayStar}
@@ -118,26 +118,26 @@ class App extends Component {
           </p>
         </header>
         <div style= {{margin:30, 'flexDirection': 'column'}}>
-          <div className="Row">            
-            <TextField id="searchField" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter} variant="outlined" />
-            <Button id="search" variant="contained" onClick = {()=>{this.handleSearch()}} style={{marginLeft: 20}}>
+          <div className="Row">     
+            <div style ={{flex: 6}}/>       
+            <TextField style ={{flex:8}} variant="outlined" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter}  />
+            <Button style={{marginLeft: 20, flex: 1, backgroundColor: 'green'}} variant="contained" onClick = {()=>{this.handleSearch()}} >
               {searchIcon}
             </Button>
+            <div style ={{flex: 6}}/>   
           </div>
-          <Table className='Table'>
-            <TableBody >
-              {this.state.rows && 
-                this.renderRows(this.state.rows)}
-            </TableBody>
+          <Table>
+            {this.state.rows && 
+              this.renderRows(this.state.rows)}
           </Table>
-          {favs.length > 0 ? <div style={{backgroundColor: '#f7fefa', alignItems: 'flex-start', justifyContent: 'flex-start', color : '#23995c'}}>
-            Favourites
-            <Table>
-              <TableBody >
+          <div style={{height: 20}}/>
+          {favs.length > 0 ? 
+            <div style= {{backgroundColor: '#f7fefa', color : '#23995c'}}>
+              <b style ={{float: 'left', marginLeft: 10, fontSize: 25}}>Favourites</b>
+              <Table>
                 { this.renderRows(favs) }
-              </TableBody>
-            </Table>
-          </div>
+              </Table>
+            </div>
           : null }          
         </div>
       </div>
