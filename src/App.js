@@ -4,7 +4,7 @@ import { Button, IconButton, Table, TableRow, TableCell, TextField, ListItemText
 import wasteData from './data.json';
 
 const greenStar = (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill = "green">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill = "#23995c">
     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
   </svg>
 );
@@ -80,7 +80,10 @@ class App extends Component {
       display: this.state.filter,
       rows: this.state.filter === "" 
         ? null 
-        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0 || item.category.toUpperCase().search(this.state.filter) >= 0),
+        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0 
+          || item.category.toUpperCase().search(this.state.filter) >= 0 
+          || item.title.toUpperCase().search(this.state.filter) >= 0
+          || item.body.toUpperCase().search(this.state.filter) >= 0),
     });
   }
 
@@ -99,8 +102,8 @@ class App extends Component {
             {row.fav ? greenStar : grayStar}
             </IconButton>
           </TableCell>
-          <TableCell>{row.title}</TableCell>
-          <TableCell>
+          <TableCell style={{width: '30%'}}>{row.title}</TableCell>
+          <TableCell style={{width: '60%'}}>
             <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
           </TableCell>
         </TableRow>
@@ -118,13 +121,11 @@ class App extends Component {
           </p>
         </header>
         <div style= {{margin:30, 'flexDirection': 'column'}}>
-          <div className="Row">     
-            <div style ={{flex: 6}}/>       
-            <TextField style ={{flex:8}} variant="outlined" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter}  />
-            <Button style={{marginLeft: 20, flex: 1, backgroundColor: 'green'}} variant="contained" onClick = {()=>{this.handleSearch()}} >
+          <div className="Row">    
+            <TextField style ={{width: '50%'}} variant="outlined" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter}  />
+            <Button style={{marginLeft: 20, height: 50, backgroundColor: '#23995c'}} variant="contained" onClick = {()=>{this.handleSearch()}} >
               {searchIcon}
-            </Button>
-            <div style ={{flex: 6}}/>   
+            </Button> 
           </div>
           <Table>
             {this.state.rows && 
@@ -134,7 +135,7 @@ class App extends Component {
           {favs.length > 0 ? 
             <div style= {{backgroundColor: '#f7fefa', color : '#23995c'}}>
               <b style ={{float: 'left', marginLeft: 10, fontSize: 25}}>Favourites</b>
-              <Table>
+              <Table style={{color: 'black'}}>
                 { this.renderRows(favs) }
               </Table>
             </div>
