@@ -80,10 +80,7 @@ class App extends Component {
       display: this.state.filter,
       rows: this.state.filter === "" 
         ? null 
-        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0 
-          || item.category.toUpperCase().search(this.state.filter) >= 0 
-          || item.title.toUpperCase().search(this.state.filter) >= 0
-          || item.body.toUpperCase().search(this.state.filter) >= 0),
+        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0),
     });
   }
 
