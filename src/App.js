@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Button, IconButton, Table, TableRow, TableCell, TextField, ListItemText } from '@material-ui/core';
+import { Button, IconButton, Table, TableRow, TableCell, TextField, TableBody } from '@material-ui/core';
 import wasteData from './data.json';
 
 const greenStar = (
@@ -43,10 +43,9 @@ class App extends Component {
     const { data, rows } = this.state;
     
     let iD = data.findIndex(obj => obj.title === item.title);
-    let iR = rows.findIndex(obj => obj.title === item.title);
-
+    let iR = rows? rows.findIndex(obj => obj.title === item.title) : -1;
     this.setState(prevState => ({
-      data: iR >= 0 
+      data: iD >= 0 
         ? [
         ...prevState.data.slice(0,iD),
         {
@@ -125,15 +124,19 @@ class App extends Component {
             </Button> 
           </div>
           <Table>
+            <TableBody>
             {this.state.rows && 
               this.renderRows(this.state.rows)}
+            </TableBody>
           </Table>
           <div style={{height: 20}}/>
           {favs.length > 0 ? 
             <div style= {{backgroundColor: '#f7fefa', color : '#23995c'}}>
               <b style ={{float: 'left', marginLeft: 10, fontSize: 25}}>Favourites</b>
               <Table style={{color: 'black'}}>
+                <TableBody>
                 { this.renderRows(favs) }
+                </TableBody>
               </Table>
             </div>
           : null }          
