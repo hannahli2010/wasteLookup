@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { Button, IconButton, Table, TableRow, TableCell, TextField, TableBody } from '@material-ui/core';
-import wasteData from './data.json';
+//import wasteData from './data.json';
 
 const greenStar = (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill = "#23995c">
@@ -23,13 +23,40 @@ const searchIcon = (
 
 class App extends Component {
   state = {
-    data: wasteData.map(item => {
+    data: "",
+    
+    /*wasteData.map(item => {
       item.fav = false;
       return item;
-    }),
+    }),*/
     filter: "",
     display: "",
     rows: null,
+  }
+
+  componentDidMount() {
+    fetch("https://secure.toronto.ca/cc_sr_v1/data/swm_waste_wizard_APR?limit=1000")
+      .then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            data: result.map(item => {
+              item.fav = false;
+              return item;
+            })
+          });
+        },
+        (error) => {
+          console.log(error);
+          this.setState({
+            data: "error",
+          });
+        }
+      )
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    return this.state.rows !== nextState.rows;
   }
   
   handleChange = event => {
@@ -39,7 +66,9 @@ class App extends Component {
     });
   } 
 
-  handleFavourite(item){
+  handleFavourite(item, e){
+
+    console.log(e);
     const { data, rows } = this.state;
     
     let iD = data.findIndex(obj => obj.title === item.title);
@@ -68,18 +97,18 @@ class App extends Component {
     }));
   }
 
-  handleEnter=(event)=>{
+  handleEnter = event => {
     if(event.key === 'Enter') {
       this.handleSearch()
     }
   }
 
-  handleSearch(){
+  handleSearch = () => {
     this.setState({
       display: this.state.filter,
-      rows: this.state.filter === "" 
+      rows: this.state.filter === ""
         ? null 
-        : this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0),
+        : this.state.data && this.state.data.filter(item => item.keywords.toUpperCase().search(this.state.filter) >= 0),
     });
   }
 
@@ -90,11 +119,12 @@ class App extends Component {
   }
 
   renderRows(list){
+    console.log("call");
     return(
       list.map((row, index) => (
         <TableRow className='Table_Row' key={index} >
            <TableCell>
-            <IconButton onClick={()=> {this.handleFavourite(row)}}>
+            <IconButton onClick={(event)=>{this.handleFavourite(row, event)}}>
             {row.fav ? greenStar : grayStar}
             </IconButton>
           </TableCell>
@@ -108,7 +138,8 @@ class App extends Component {
   }
 
   render() {
-    let favs = this.state.data.filter(item => item.fav === true);
+    let favs = this.state.data && this.state.data.filter(item => item.fav === true);
+
     return (
       <div className="App">
         <header className="App-header">
@@ -119,7 +150,7 @@ class App extends Component {
         <div style= {{margin:30, 'flexDirection': 'column'}}>
           <div className="Row">    
             <TextField style ={{width: '50%'}} variant="outlined" type="text" onChange={this.handleChange} onKeyPress ={this.handleEnter}  />
-            <Button style={{marginLeft: 20, height: 50, backgroundColor: '#23995c'}} variant="contained" onClick = {()=>{this.handleSearch()}} >
+            <Button style={{marginLeft: 20, height: 50, backgroundColor: '#23995c'}} variant="contained" onClick = {this.handleSearch} >
               {searchIcon}
             </Button> 
           </div>
