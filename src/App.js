@@ -47,7 +47,6 @@ class App extends Component {
           });
         },
         (error) => {
-          console.log(error);
           this.setState({
             data: "error",
           });
@@ -67,12 +66,10 @@ class App extends Component {
   } 
 
   handleFavourite(item, e){
-
-    console.log(e);
     const { data, rows } = this.state;
     
     let iD = data.findIndex(obj => obj.title === item.title);
-    let iR = rows? rows.findIndex(obj => obj.title === item.title) : -1;
+    let iR = rows ? rows.findIndex(obj => obj.title === item.title) : -1;
     this.setState(prevState => ({
       data: iD >= 0 
         ? [
@@ -99,11 +96,12 @@ class App extends Component {
 
   handleEnter = event => {
     if(event.key === 'Enter') {
-      this.handleSearch()
+      this.handleSearch(event)
     }
   }
 
-  handleSearch = () => {
+  handleSearch = (event) => {
+    event.preventDefault();
     this.setState({
       display: this.state.filter,
       rows: this.state.filter === ""
@@ -119,7 +117,6 @@ class App extends Component {
   }
 
   renderRows(list){
-    console.log("call");
     return(
       list.map((row, index) => (
         <TableRow className='Table_Row' key={index} >
@@ -130,7 +127,7 @@ class App extends Component {
           </TableCell>
           <TableCell style={{width: '30%'}}>{row.title}</TableCell>
           <TableCell style={{width: '60%'}}>
-            <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
+          <div dangerouslySetInnerHTML= {{__html: this.htmlDecode(row.body)}}/>
           </TableCell>
         </TableRow>
       ))
@@ -139,7 +136,7 @@ class App extends Component {
 
   render() {
     let favs = this.state.data && this.state.data.filter(item => item.fav === true);
-
+    
     return (
       <div className="App">
         <header className="App-header">
